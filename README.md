@@ -34,11 +34,4 @@ I use a variety of tools and languages, but these are my most active:
 
 ### GitHub Stats
 
-<p align="left">
-  <img src="https://github.com/llawn/llawn/blob/master/github-readme-stats.svg" alt="llawn stats" width="400" />
-  <img src="https://github.com/llawn/llawn/blob/master/top-langs.svg" alt="top langs" width="300" />
-</p>
-
-
-
-
+![My GitHub Metrics](github-metrics.svg)
