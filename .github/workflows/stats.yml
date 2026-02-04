@@ -1,19 +1,21 @@
 name: GitHub Readme Stats
-
 on:
   schedule:
     - cron: '0 0 * * *'
-  workflow_dispatch: 
-
+  workflow_dispatch:
 jobs:
   stats:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Generate Stats
-        uses: anuraghazra/github-readme-stats@master
+        uses: teoxoy/profile-readme-stats@v2
         with:
-          username: llawn
           token: ${{ secrets.GH_TOKEN }}
-          theme: nord
-          count_private: true
-          show_icons: true
+      - name: Commit & Push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Update GitHub stats" || exit 0
+          git push
