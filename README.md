@@ -14,7 +14,7 @@ I've developed several tools to streamline local workflows:
 
 I use a variety of tools and languages, but these are my most active:
 
-![Languages](https://skillicons.dev/icons?i=c,python,latex,lua,shell,zig,R,matlab)
+![Languages](https://skillicons.dev/icons?i=c,python,latex,lua,r,zig,matlab)
 
 - **Languages:** C, Python, TeX/LaTeX, Lua, R, matlab, zig, Shell
 - **Tools:** Neovim, Git, Linux
@@ -27,6 +27,7 @@ I use a variety of tools and languages, but these are my most active:
 ### GitHub Stats
 
 <p align="left">
-<img src="https://github-readme-stats.vercel.app/api?username=llawn&show_icons=true&theme=nord" alt="llawn stats" width="400" />
-<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=llawn&layout=compact&theme=nord" alt="top langs" width="300" />
+  <img src="https://github.com/llawn/llawn/blob/master/github-readme-stats.svg" alt="llawn stats" width="400" />
+  <img src="https://github.com/llawn/llawn/blob/master/top-langs.svg" alt="top langs" width="300" />
 </p>
+
