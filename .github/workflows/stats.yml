@@ -1,0 +1,19 @@
+name: GitHub Readme Stats
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch: 
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Stats
+        uses: anuraghazra/github-readme-stats@master
+        with:
+          username: llawn
+          token: ${{ secrets.GH_TOKEN }}
+          theme: nord
+          count_private: true
+          show_icons: true
