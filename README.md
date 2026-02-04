@@ -1,6 +1,6 @@
 # Hi there, I'm llawn!
 
-I'm a student at **École Centrale de Lyon** 🇫🇷 and a **Neovim enthusiast**. I enjoy building tools that improve the developer experience, specifically within the Lua/Nvim ecosystem.
+I'm a student at **École Centrale de Lyon** 🇫🇷 and a **Neovim enthusiast**. I enjoy building tools that improve the developer experience, specifically within the Nvim ecosystem.
 
 ## Neovim Plugins
 
@@ -45,5 +45,6 @@ I use a variety of tools and languages, but these are my most active:
   <img src="https://github.com/llawn/llawn/blob/master/github-readme-stats.svg" alt="llawn stats" width="400" />
   <img src="https://github.com/llawn/llawn/blob/master/top-langs.svg" alt="top langs" width="300" />
 </p>
+
 
 
