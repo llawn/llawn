@@ -1,6 +1,6 @@
 # Hi there, I'm llawn!
 
-I'm a student at **École Centrale de Lyon** 🇫🇷 and a **Neovim enthusiast**. I enjoy building tools that improve the developer experience, specifically within the Nvim ecosystem.
+I enjoy building tools that improve the developer experience, specifically within the Nvim ecosystem.
 
 ## Neovim Plugins
 
@@ -35,3 +35,4 @@ I use a variety of tools and languages, but these are my most active:
 ### GitHub Stats
 
 ![My GitHub Metrics](github-metrics.svg)
+
