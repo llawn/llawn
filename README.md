@@ -4,7 +4,14 @@ I enjoy building tools that improve the developer experience, specifically withi
 
 ## Tech Stack
 
-**Current Environment:** Running **Arch Linux** + **Hyprland** + **Noctalia Shell**
+**Current Environment:** 
+- OS: **Arch Linux**
+- DE: **Hyprland** + **Noctalia Shell**
+- Editor: **Neovim**
+
+**Past Environment:**
+- OS: **Fedora**, **NixOS**, **Bluefin**
+- DE: **Gnome**, **Niri**
 
 I use a variety of tools and languages, but these are my most active:
 
