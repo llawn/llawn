@@ -8,29 +8,29 @@ I enjoy building tools that improve the developer experience, specifically withi
 
 - Kernel: Linux
 - OS: Arch Linux
-- Disk: btrfs
-- Bootloader: systemd
-- Disk unlocking: systemd-cryptsetup (LUKS)
-- Graphical boot: plymouth
+- Disk: `btrfs`
+- Bootloader: `systemd`
+- Disk unlocking: `systemd-cryptsetup` (LUKS)
+- Graphical boot: `plymouth`
 
 ### Desktop Environment
 
-- Window Manager: Hyprland
-- Desktop Shell: Noctalia-shell
-- Greeter: cosmic-greeter
+- Window Manager: `Hyprland`
+- Desktop Shell: `Noctalia-shell`
+- Greeter: `cosmic-greeter`
 
 ### Package Managers
 
-- Native: pacman
-- AUR: paru
-- Flatpak: Bazaar
+- Native: `pacman`
+- AUR: `paru`
+- Flatpak: `Bazaar`
 
 ### System Services & Drivers
 
-- Audio: PipeWire + Wireplumber
-- Ethernet: iwd + impala (TUI)
-- Bluetooth: bluez + bluez-utils + bluetui (TUI)
-- Print: CUPS
+- Audio: `PipeWire` + `Wireplumber`
+- Ethernet: `iwd` + `impala` (TUI)
+- Bluetooth: `bluez` + `bluez-utils` + `bluetui` (TUI)
+- Print: `CUPS`
 
 ### GUI Apps
 
