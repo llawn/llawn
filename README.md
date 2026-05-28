@@ -38,6 +38,7 @@ I enjoy building tools that improve the developer experience, specifically withi
 * File Manager: [nautilus](https://gitlab.gnome.org/GNOME/nautilus)
 * Mail: [evolution](https://gitlab.gnome.org/GNOME/evolution)
 * Note: [Joplin](https://github.com/laurent22/joplin)
+* Office: [OnlyOffice](https://github.com/ONLYOFFICE)
 * Terminal: [kitty](https://github.com/kovidgoyal/kitty)
 * Viewer (Image): [ImageViewer](https://gitlab.gnome.org/GNOME/loupe) + [imv](https://sr.ht/~exec64/imv/)
 * Viewer (PDF): [Zathura](https://github.com/pwmt/zathura)
