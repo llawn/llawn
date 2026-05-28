@@ -43,7 +43,7 @@
                                     <rect class="day" x="150" y="0" width="11" height="11" fill="#ebedf0" rx="2" ry="2"/>
                                     <rect class="day" x="165" y="0" width="11" height="11" fill="#9be9a8" rx="2" ry="2"/>
                                     <rect class="day" x="180" y="0" width="11" height="11" fill="#9be9a8" rx="2" ry="2"/>
-                                    <rect class="day" x="195" y="0" width="11" height="11" fill="#ebedf0" rx="2" ry="2"/>
+                                    <rect class="day" x="195" y="0" width="11" height="11" fill="#9be9a8" rx="2" ry="2"/>
                                 </g>
                             </svg>
                         </div>
@@ -71,14 +71,14 @@
                         <rect x="0" y="0" width="460" height="8" fill="white" rx="5"/>
                     </mask>
                     <rect mask="url(#languages-bar)" x="0" y="0" width="0" height="8" fill="#d1d5da"/>
-                    <rect mask="url(#languages-bar)" x="0" y="0" width="380.35562670730707" height="8" fill="#DA5B0B"/>
-                    <rect mask="url(#languages-bar)" x="380.35562670730707" y="0" width="64.84762475684802" height="8" fill="#000080"/>
-                    <rect mask="url(#languages-bar)" x="445.2032514641551" y="0" width="9.161040454547837" height="8" fill="#00ADD8"/>
-                    <rect mask="url(#languages-bar)" x="454.3642919187029" y="0" width="1.6352396914919087" height="8" fill="#f1e05a"/>
-                    <rect mask="url(#languages-bar)" x="455.9995316101948" y="0" width="1.5934341536563243" height="8" fill="#663399"/>
-                    <rect mask="url(#languages-bar)" x="457.5929657638511" y="0" width="1.4358594341221973" height="8" fill="#e34c26"/>
-                    <rect mask="url(#languages-bar)" x="459.0288251979733" y="0" width="0.6568293156090903" height="8" fill="#3572A5"/>
-                    <rect mask="url(#languages-bar)" x="459.6856545135824" y="0" width="0.31434548641756954" height="8" fill="#89e051"/>
+                    <rect mask="url(#languages-bar)" x="0" y="0" width="379.343245598745" height="8" fill="#DA5B0B"/>
+                    <rect mask="url(#languages-bar)" x="379.343245598745" y="0" width="65.89938992504793" height="8" fill="#000080"/>
+                    <rect mask="url(#languages-bar)" x="445.2426355237929" y="0" width="9.13665678926268" height="8" fill="#00ADD8"/>
+                    <rect mask="url(#languages-bar)" x="454.3792923130556" y="0" width="1.6308872232874325" height="8" fill="#f1e05a"/>
+                    <rect mask="url(#languages-bar)" x="456.010179536343" y="0" width="1.589192957991982" height="8" fill="#663399"/>
+                    <rect mask="url(#languages-bar)" x="457.599372494335" y="0" width="1.4320376503398988" height="8" fill="#e34c26"/>
+                    <rect mask="url(#languages-bar)" x="459.0314101446749" y="0" width="0.6550810528150601" height="8" fill="#3572A5"/>
+                    <rect mask="url(#languages-bar)" x="459.68649119748994" y="0" width="0.31350880251002267" height="8" fill="#89e051"/>
                 </svg>
                 <div class="field center horizontal-wrap fill-width">
                     <div class="field center no-wrap language">
@@ -1359,14 +1359,14 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
                                             <path fill-rule="evenodd" d="M5 3.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm0 2.122a2.25 2.25 0 10-1.5 0v.878A2.25 2.25 0 005.75 8.5h1.5v2.128a2.251 2.251 0 101.5 0V8.5h1.5a2.25 2.25 0 002.25-2.25v-.878a2.25 2.25 0 10-1.5 0v.878a.75.75 0 01-.75.75h-4.5A.75.75 0 015 6.25v-.878zm3.75 7.378a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm3-8.75a.75.75 0 100-1.5.75.75 0 000 1.5z"/>
                                         </svg>
-                                        448
+                                        447
                                     </div>
                                     <div>
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
                                             <path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
                                             <path fill-rule="evenodd" d="M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"/>
                                         </svg>
-                                        652
+                                        653
                                     </div>
                                     <div>
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
