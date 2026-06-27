@@ -16,8 +16,8 @@ I enjoy building tools that improve the developer experience, specifically withi
 ### Desktop Environment
 
 * Window Manager: [Hyprland](https://github.com/hyprwm/Hyprland)
-* Desktop Shell: [noctalia-shell](https://github.com/noctalia-dev/noctalia-shell)
-* Greeter: [cosmic-greeter](https://github.com/pop-os/cosmic-greeter)
+* Desktop Shell: [noctalia](https://github.com/noctalia-dev/noctalia)
+* Greeter: [noctalia-greeter](https://github.com/noctalia-dev/noctalia-greeter)
 
 ### Package Managers
 
@@ -54,7 +54,7 @@ I enjoy building tools that improve the developer experience, specifically withi
 * Journal: [lazyjournal](https://github.com/Lifailon/lazyjournal)
 * Note: [toney](https://github.com/SourcewareLab/Toney)
 * Sql: [lazysql](https://github.com/jorgerojas26/lazysql)
-* System monitoring: [htop](https://github.com/htop-dev/htop)
+* System monitoring: [btop](https://github.com/aristocratos/btop)
 
 ### Shell & CLI
 
