@@ -32,7 +32,6 @@ LANG_COLORS = {
 }
 OTHER_COLOR = "#8b949e"
 ACTIVITY_DAYS = 100
-STARRED_PER_FORGE = 3
 
 
 def get(url, token=None, auth="token", body=None):
@@ -42,6 +41,17 @@ def get(url, token=None, auth="token", body=None):
         req.add_header("Authorization", f"{auth} {token}" if auth else token)
     with urllib.request.urlopen(req, timeout=30) as resp:
         return json.load(resp)
+
+
+def get_all(url, token=None, auth="token", size=100):
+    """Every page of a list endpoint; `url` already has a query string. Gitea calls the page size `limit`."""
+    items, page = [], 1
+    while True:
+        batch = try_get(f"{url}&page={page}", token, auth, [])
+        items += batch
+        if len(batch) < size:
+            return items
+        page += 1
 
 
 def try_get(url, token=None, auth="token", default=None, body=None):
@@ -64,7 +74,7 @@ def github():
         res = try_get(f"{api}/graphql", tok, "Bearer", {}, {"query": query})
         weeks = (((res.get("data") or {}).get("user") or {}).get("contributionsCollection") or {}).get("contributionCalendar", {}).get("weeks", [])
         activity = {d["date"]: d["contributionCount"] for w in weeks for d in w["contributionDays"]}
-    starred = try_get(f"{api}/users/{GITHUB_USER}/starred?per_page=100", tok, "Bearer", [])
+    starred = get_all(f"{api}/users/{GITHUB_USER}/starred?per_page=100", tok, "Bearer")
     return {
         "name": "GitHub",
         "url": f"https://github.com/{GITHUB_USER}",
@@ -96,7 +106,7 @@ def codeberg():
         day = datetime.fromtimestamp(h["timestamp"], timezone.utc).date().isoformat()
         activity[day] = activity.get(day, 0) + h["contributions"]
     # Gitea only lists stars to an authenticated client.
-    starred = try_get(f"{api}/users/{CODEBERG_USER}/starred?limit=50", tok, default=[]) if tok else []
+    starred = get_all(f"{api}/users/{CODEBERG_USER}/starred?limit=50", tok, size=50) if tok else []
     return {
         "name": "Codeberg",
         "url": f"https://codeberg.org/{CODEBERG_USER}",
@@ -148,7 +158,7 @@ def gitlab():
         # No language is exposed here.
         "starred": [
             {"name": p["path_with_namespace"], "stars": p["star_count"], "language": None}
-            for p in try_get(f"{api}/users/{uid}/starred_projects?per_page=100", default=[])
+            for p in get_all(f"{api}/users/{uid}/starred_projects?per_page=100")
         ],
         "repos": repos,
     }
@@ -288,7 +298,7 @@ def build_svg(forges):
         out.append(f'<text x="{W - pad}" y="{y}" class="muted" text-anchor="end">{r["forge"]} · {when}</text>')
         y += 20
 
-    # Most-starred repositories I starred, per forge so a big forge does not crowd out the others.
+    # Everything I starred, per forge so a big forge does not crowd out the others, most-starred first.
     with_stars = [f for f in forges if f["starred"]]
     if with_stars:
         y += 10
@@ -298,7 +308,7 @@ def build_svg(forges):
             y += 20
             out.append(f'<text x="{pad}" y="{y}" class="muted">{f["name"]}</text>')
             y += 20
-            for s in sorted(f["starred"], key=lambda s: s["stars"], reverse=True)[:STARRED_PER_FORGE]:
+            for s in sorted(f["starred"], key=lambda s: s["stars"], reverse=True):
                 meta = [f"★ {short(s['stars'])}"] + ([s["language"]] if s["language"] else [])
                 name = s["name"] if len(s["name"]) <= 44 else s["name"][:43] + "…"
                 out.append(f'<text x="{pad + 12}" y="{y}" class="stat">{escape(name)}</text>')
