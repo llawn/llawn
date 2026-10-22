@@ -50,7 +50,3 @@ I enjoy building tools that improve the developer experience, specifically withi
 ## Forges
 
 ![Across GitHub, Codeberg and GitLab](https://raw.githubusercontent.com/llawn/llawn/main/forges.svg)
-
-## GitHub Stats
-
-![My GitHub Metrics](https://raw.githubusercontent.com/llawn/llawn/main/github-metrics.svg)

@@ -21,6 +21,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Also used by sync-profile.yml to push; here only for the GitLab follower count
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          # Optional, read:user scope; Codeberg only lists starred repos to a logged-in client
+          CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
         run: python .github/scripts/forges.py forges.svg
       - name: Commit
         run: |

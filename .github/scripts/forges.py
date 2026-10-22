@@ -2,7 +2,7 @@
 
 Tokens are optional and read from the environment:
   GITHUB_TOKEN   raises the GitHub rate limit
-  CODEBERG_TOKEN not required (public data only)
+  CODEBERG_TOKEN only needed to list starred repositories
   GITLAB_TOKEN   used only for the GitLab follower count (also pushes the profile README)
 """
 
@@ -10,7 +10,7 @@ import json
 import os
 import sys
 import urllib.request
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from html import escape
 
 GITHUB_USER = "llawn"
@@ -31,19 +31,22 @@ LANG_COLORS = {
     "Vim Script": "#199f4b", "Zig": "#ec915c",
 }
 OTHER_COLOR = "#8b949e"
+ACTIVITY_DAYS = 100
+STARRED_PER_FORGE = 3
 
 
-def get(url, token=None, auth="token"):
-    req = urllib.request.Request(url, headers={"User-Agent": "forges-card", "Accept": "application/json"})
+def get(url, token=None, auth="token", body=None):
+    data = json.dumps(body).encode() if body is not None else None
+    req = urllib.request.Request(url, data=data, headers={"User-Agent": "forges-card", "Accept": "application/json"})
     if token:
         req.add_header("Authorization", f"{auth} {token}" if auth else token)
     with urllib.request.urlopen(req, timeout=30) as resp:
         return json.load(resp)
 
 
-def try_get(url, token=None, auth="token", default=None):
+def try_get(url, token=None, auth="token", default=None, body=None):
     try:
-        return get(url, token, auth)
+        return get(url, token, auth, body)
     except Exception as e:  # one broken forge should not break the card
         print(f"warning: {url}: {e}", file=sys.stderr)
         return default
@@ -54,10 +57,23 @@ def github():
     api = "https://api.github.com"
     user = try_get(f"{api}/users/{GITHUB_USER}", tok, "Bearer", {})
     repos = [r for r in try_get(f"{api}/users/{GITHUB_USER}/repos?per_page=100", tok, "Bearer", []) if not r["fork"] and r["name"] not in PROFILE_REPOS]
+    # The contribution calendar is only exposed through GraphQL, which needs a token.
+    activity = {}
+    if tok:
+        query = f'{{user(login:"{GITHUB_USER}"){{contributionsCollection{{contributionCalendar{{weeks{{contributionDays{{date contributionCount}}}}}}}}}}}}'
+        res = try_get(f"{api}/graphql", tok, "Bearer", {}, {"query": query})
+        weeks = (((res.get("data") or {}).get("user") or {}).get("contributionsCollection") or {}).get("contributionCalendar", {}).get("weeks", [])
+        activity = {d["date"]: d["contributionCount"] for w in weeks for d in w["contributionDays"]}
+    starred = try_get(f"{api}/users/{GITHUB_USER}/starred?per_page=100", tok, "Bearer", [])
     return {
         "name": "GitHub",
         "url": f"https://github.com/{GITHUB_USER}",
         "followers": user.get("followers"),
+        "activity": activity,
+        "starred": [
+            {"name": r["full_name"], "stars": r["stargazers_count"], "language": r["language"]}
+            for r in starred
+        ],
         "repos": [
             {
                 "name": r["name"],
@@ -75,10 +91,18 @@ def codeberg():
     api = "https://codeberg.org/api/v1"
     user = try_get(f"{api}/users/{CODEBERG_USER}", tok, default={})
     repos = [r for r in try_get(f"{api}/users/{CODEBERG_USER}/repos?limit=50", tok, default=[]) if not r["fork"] and r["name"] not in PROFILE_REPOS]
+    activity = {}
+    for h in try_get(f"{api}/users/{CODEBERG_USER}/heatmap", tok, default=[]):
+        day = datetime.fromtimestamp(h["timestamp"], timezone.utc).date().isoformat()
+        activity[day] = activity.get(day, 0) + h["contributions"]
+    # Gitea only lists stars to an authenticated client.
+    starred = try_get(f"{api}/users/{CODEBERG_USER}/starred?limit=50", tok, default=[]) if tok else []
     return {
         "name": "Codeberg",
         "url": f"https://codeberg.org/{CODEBERG_USER}",
         "followers": user.get("followers_count"),
+        "activity": activity,
+        "starred": [{"name": r["full_name"], "stars": r["stars_count"], "language": r["language"]} for r in starred],
         "repos": [
             {
                 "name": r["name"],
@@ -98,7 +122,7 @@ def gitlab():
     # to push) is used for the follower count alone.
     users = try_get(f"{api}/users?username={GITLAB_USER}", default=[])
     if not users:
-        return {"name": "GitLab", "url": f"https://gitlab.com/{GITLAB_USER}", "followers": None, "repos": []}
+        return {"name": "GitLab", "url": f"https://gitlab.com/{GITLAB_USER}", "followers": None, "repos": [], "activity": {}, "starred": []}
     uid = users[0]["id"]
     user = try_get(f"{api}/users/{uid}", tok, "Bearer", {}) if tok else {}
     projects = try_get(f"{api}/users/{uid}/projects?per_page=100", default=[])
@@ -119,12 +143,38 @@ def gitlab():
         "name": "GitLab",
         "url": f"https://gitlab.com/{GITLAB_USER}",
         "followers": user.get("followers"),
+        # Not part of the REST API, but public and used by the profile page itself.
+        "activity": try_get(f"https://gitlab.com/users/{GITLAB_USER}/calendar.json", default={}),
+        # No language is exposed here.
+        "starred": [
+            {"name": p["path_with_namespace"], "stars": p["star_count"], "language": None}
+            for p in try_get(f"{api}/users/{uid}/starred_projects?per_page=100", default=[])
+        ],
         "repos": repos,
     }
 
 
 def parse_date(s):
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
+
+
+def short(n):
+    return f"{n / 1000:.1f}k" if n >= 1000 else str(n)
+
+
+def streaks(counts):
+    """Current and longest runs of active days; today does not break the current run yet."""
+    longest = run = 0
+    for n in counts:
+        run = run + 1 if n else 0
+        longest = max(longest, run)
+    tail = counts if counts[-1] else counts[:-1]
+    current = 0
+    for n in reversed(tail):
+        if not n:
+            break
+        current += 1
+    return current, longest
 
 
 def build_svg(forges):
@@ -188,6 +238,47 @@ def build_svg(forges):
         out.append(f'<text x="{lx + 15}" y="{ly}" class="stat">{escape(name)} <tspan class="muted">{100 * v / total:.1f}%</tspan></text>')
     y += ((len(top) + 2) // 3) * 20 + 14
 
+    # Contributions over the last ACTIVITY_DAYS, summed across forges, GitHub-style (weeks start on Sunday),
+    # with a per-forge breakdown and streaks beside the calendar.
+    today = datetime.now(timezone.utc).date()
+    days = [today - timedelta(days=i) for i in range(ACTIVITY_DAYS - 1, -1, -1)]
+    per_forge = {f["name"]: [f["activity"].get(d.isoformat(), 0) for d in days] for f in forges}
+    counts = [sum(c[i] for c in per_forge.values()) for i in range(len(days))]
+    peak = max(counts) or 1
+    out.append(f'<text x="{pad}" y="{y}" class="section">Activity</text>')
+    out.append(f'<text x="{W - pad}" y="{y}" class="muted" text-anchor="end">last {ACTIVITY_DAYS} days</text>')
+    y += 12
+    step, cell = 17, 14
+    lead = (days[0].weekday() + 1) % 7
+    for i, (d, n) in enumerate(zip(days, counts)):
+        level = 0 if n == 0 else min(4, 1 + 4 * (n - 1) // peak)
+        k = i + lead
+        detail = ", ".join(f"{name} {c[i]}" for name, c in per_forge.items() if c[i])
+        tip = f"{d.isoformat()}: {n}" + (f" ({detail})" if detail else "")
+        out.append(f'<rect x="{pad + (k // 7) * step}" y="{y + (k % 7) * step}" width="{cell}" height="{cell}" rx="2" class="l{level}"><title>{tip}</title></rect>')
+
+    sx = pad + ((lead + len(days) - 1) // 7 + 1) * step + 16
+    rows = []
+    for name, c in per_forge.items():
+        rows.append((name, f"{sum(c)} · {sum(1 for n in c if n)}d", f"f-{name.lower()}"))
+    current, longest = streaks(counts)
+    best = max(range(len(days)), key=lambda i: counts[i])
+    rows += [
+        ("Total", str(sum(counts)), None),
+        ("Active days", f"{sum(1 for n in counts if n)} / {ACTIVITY_DAYS}", None),
+        ("Streak", f"{current}d (best {longest}d)", None),
+        ("Best day", f"{days[best].strftime('%b %d')} · {counts[best]}" if counts[best] else "–", None),
+    ]
+    for i, (label, value, dot) in enumerate(rows):
+        ry = y + i * step + 11
+        tx = sx
+        if dot:
+            out.append(f'<circle cx="{sx + 4}" cy="{ry - 4}" r="4" class="{dot}"/>')
+            tx += 13
+        out.append(f'<text x="{tx}" y="{ry}" class="{"stat" if dot else "muted"}">{label}</text>')
+        out.append(f'<text x="{W - pad}" y="{ry}" class="stat" text-anchor="end">{value}</text>')
+    y += 7 * step + 22
+
     # Most recently updated projects, wherever they live.
     out.append(f'<text x="{pad}" y="{y}" class="section">Recently active</text>')
     y += 22
@@ -195,6 +286,25 @@ def build_svg(forges):
         when = parse_date(r["updated"]).strftime("%Y-%m-%d")
         out.append(f'<text x="{pad}" y="{y}" class="stat">{escape(r["name"])}</text>')
         out.append(f'<text x="{W - pad}" y="{y}" class="muted" text-anchor="end">{r["forge"]} · {when}</text>')
+        y += 20
+
+    # Most-starred repositories I starred, per forge so a big forge does not crowd out the others.
+    with_stars = [f for f in forges if f["starred"]]
+    if with_stars:
+        y += 10
+        out.append(f'<text x="{pad}" y="{y}" class="section">Starred</text>')
+        y += 4
+        for f in with_stars:
+            y += 20
+            out.append(f'<text x="{pad}" y="{y}" class="muted">{f["name"]}</text>')
+            y += 20
+            for s in sorted(f["starred"], key=lambda s: s["stars"], reverse=True)[:STARRED_PER_FORGE]:
+                meta = [f"★ {short(s['stars'])}"] + ([s["language"]] if s["language"] else [])
+                name = s["name"] if len(s["name"]) <= 44 else s["name"][:43] + "…"
+                out.append(f'<text x="{pad + 12}" y="{y}" class="stat">{escape(name)}</text>')
+                out.append(f'<text x="{W - pad}" y="{y}" class="muted" text-anchor="end">{escape(" · ".join(meta))}</text>')
+                y += 20
+            y -= 20
         y += 20
 
     y += 4
@@ -210,11 +320,15 @@ def build_svg(forges):
     .stat { font-size: 12px; }
     .muted { font-size: 12px; fill: #57606a; }
     .tiny { font-size: 10px; fill: #8c959f; }
+    .f-github { fill: #24292f; } .f-codeberg { fill: #2185d0; } .f-gitlab { fill: #fc6d26; }
+    .l0 { fill: #ebedf0; } .l1 { fill: #9be9a8; } .l2 { fill: #40c463; } .l3 { fill: #30a14e; } .l4 { fill: #216e39; }
     @media (prefers-color-scheme: dark) {
       text { fill: #c9d1d9; }
       .forge { fill: #58a6ff; }
       .muted { fill: #8b949e; }
       .tiny { fill: #6e7681; }
+      .f-github { fill: #f0f6fc; }
+      .l0 { fill: #161b22; } .l1 { fill: #0e4429; } .l2 { fill: #006d32; } .l3 { fill: #26a641; } .l4 { fill: #39d353; }
     }
     """
     return (
@@ -228,7 +342,7 @@ def main():
     with open(OUTPUT, "w") as fh:
         fh.write(build_svg(forges))
     for f in forges:
-        print(f"{f['name']}: {len(f['repos'])} repos, followers={f['followers']}")
+        print(f"{f['name']}: {len(f['repos'])} repos, followers={f['followers']}, active days={len(f['activity'])}, starred={len(f['starred'])}")
 
 
 if __name__ == "__main__":
